@@ -3,7 +3,7 @@ import { pool } from "./db/index.js";
 export async function getAuthors() {
   try {
     const result = await pool.query("SELECT * FROM authors");
-    return result.data.rows;
+    return result.rows;
   } catch (error) {
     console.error("Error fetching authors:", error);
     throw error;
