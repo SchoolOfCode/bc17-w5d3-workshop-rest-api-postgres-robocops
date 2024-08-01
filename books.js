@@ -31,13 +31,56 @@ export async function getBookById(id) {
 }
 
 export async function createBook(book) {
-  // Query the database to create a book and return the newly created book
+  const { title, published_date, author_id } = book;
+  const queryText = `
+  INSERT INTO books (title, published_date, author_id)
+  VALUES ($1, $2, $3)
+  RETURNING *`;
+
+  try {
+    const res = await pool.query(queryText, [title, published_date, author_id]);
+    return res.rows[0];
+  } catch (err) {
+    console.error("Error creating book:", err);
+  }
 }
 
+// Query the database to update a book and return the newly updated book or null
 export async function updateBookById(id, updates) {
-  // Query the database to update a book and return the newly updated book or null
+  const queryText =
+    "UPDATE books SET title = $2, published_date = $3, author_id = $4 WHERE id = $1";
+  try {
+    const res = await pool.query(queryText, [
+      id,
+      updates.title,
+      updates.published_date,
+      updates.author_id,
+    ]);
+    if (res.rowCount > 0) {
+      return `Book with id ${id} has been updated successfully`;
+    } else {
+      return false;
+    }
+  } catch (error) {
+		console.error(error)
+		return false;
+	}
 }
 
 export async function deleteBookById(id) {
   // Query the database to delete a book and return the deleted book or null
+
+  let queryText = "DELETE FROM books WHERE id = $1";
+  try {
+    let res = await pool.query(queryText, [id]);
+
+		if (res.rowCount > 0) {
+			return `Book with id ${id} has been deleted successfully`
+		} else {
+			return false;
+		}
+  } catch (error) {
+    console.log(error);
+		return false;
+  }
 }
